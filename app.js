@@ -1,21 +1,20 @@
-
-var express      = require('express');
-var path         = require('path');
-var favicon      = require('serve-favicon');
-var logger       = require('morgan');
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
 var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
-var moment       = require('moment');
+var bodyParser = require('body-parser');
+var moment = require('moment');
 
 var app = express();
 
 // View engine setup
 var handlebars = require('express-handlebars')
-  .create({
-    defaultLayout : 'main',
-    extname       : '.hbs',
-    helpers       : require('./lib/view/helpers')(),
-  });
+    .create({
+        defaultLayout: 'main',
+        extname: '.hbs',
+        helpers: require('./lib/view/helpers')(),
+    });
 
 app.engine('.hbs', handlebars.engine);
 app.set('view engine', '.hbs');
@@ -41,11 +40,11 @@ var session = require('express-session');
 // initalize sequelize with session store
 var SequelizeStore = require('connect-session-sequelize')(session.Store);
 app.use(session({
-    secret            : 'my dirty secret ;khjsdkjahsdajhasdam,nnsnad,',
-    resave            : false,
-    saveUninitialized : false,
+    secret: 'my dirty secret ;khjsdkjahsdajhasdam,nnsnad,',
+    resave: false,
+    saveUninitialized: false,
     store: new SequelizeStore({
-      db: app.get('db_model').sequelize
+        db: app.get('db_model').sequelize
     }),
 }))
 app.use(passport.initialize());
@@ -56,10 +55,11 @@ app.use(passport.session());
 // Custom middlewares
 //
 // Make sure session and user objects are available in templates
-app.use(function(req,res,next){
-    res.locals.session     = req.session;
+app.use(function(req, res, next) {
+    res.locals.session = req.session;
     res.locals.logged_user = req.user;
     res.locals.url_to_the_site_root = '/';
+    res.locals.person_object = 'Students';
     res.locals.requested_path = req.originalUrl;
     // For book leave request modal
     res.locals.booking_start = moment();
@@ -67,61 +67,61 @@ app.use(function(req,res,next){
     next();
 });
 
-app.use(function(req,res,next){
+app.use(function(req, res, next) {
     res.locals.custom_java_script = [
-      '/js/bootstrap-datepicker.js',
-      '/js/global.js'
+        '/js/bootstrap-datepicker.js',
+        '/js/global.js'
     ];
     res.locals.custom_css = [
-      '/css/bootstrap-datepicker3.standalone.css'
+        '/css/bootstrap-datepicker3.standalone.css'
     ];
 
     next();
 });
 
 // Enable flash messages within session
-app.use( require('./lib/middleware/flash_messages') );
+app.use(require('./lib/middleware/flash_messages'));
 
-app.use( require('./lib/middleware/session_aware_redirect') );
+app.use(require('./lib/middleware/session_aware_redirect'));
 
 // Here will be publicly accessible routes
 
 app.use(
-  '/feed/',
-  require('./lib/route/feed')
+    '/feed/',
+    require('./lib/route/feed')
 );
 
 app.use(
-  '/',
-  require('./lib/route/login')(passport),
+    '/',
+    require('./lib/route/login')(passport),
 
-  // All rotes bellow are only for authenticated users
-  require('./lib/route/dashboard.js')
+    // All rotes bellow are only for authenticated users
+    require('./lib/route/dashboard.js')
 );
 
 app.use(
-  '/calendar/',
-  require('./lib/route/calendar.js')
+    '/calendar/',
+    require('./lib/route/calendar.js')
 );
 
 app.use(
-  '/settings/',
-  require('./lib/route/settings.js')
+    '/settings/',
+    require('./lib/route/settings.js')
 );
 
 app.use(
-  '/users/',
-  require('./lib/route/users.js')
+    '/users/',
+    require('./lib/route/users.js')
 );
 
 app.use(
-  '/requests/',
-  require('./lib/route/requests.js')
+    '/requests/',
+    require('./lib/route/requests.js')
 );
 
 app.use(
-  '/audit/',
-  require('./lib/route/audit.js')
+    '/audit/',
+    require('./lib/route/audit.js')
 );
 
 // catch 404 and forward to error handler
